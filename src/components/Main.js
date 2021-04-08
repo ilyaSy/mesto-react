@@ -15,13 +15,11 @@ export default function Main(props){
       api.getUserInfo(),
       api.getInitialCards()
     ])
-      .then(data => {
-        const userData = data[0];
+      .then(([userData, initialCards]) => {
         setUserName(userData.name);
         setUserDescription(userData.about);
         setUserAvatar(userData.avatar);
-
-        const initialCards = data[1];
+        
         setCards(initialCards);
       })
       .catch(err => console.log('Ошибка: ' + err))
@@ -46,7 +44,7 @@ export default function Main(props){
 
       <section className="elements" aria-label="elements">
         {cards.map((card, i) =>
-          <Card card={card} key={`card-${i}`} onCardClick={props.onCardClick}/>
+          <Card card={card} key={`card-${card._id}`} onCardClick={props.onCardClick} onDeleteClick={props.onDeleteClick}/>
         )}
       </section>
     </main>

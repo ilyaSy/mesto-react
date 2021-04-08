@@ -15,7 +15,7 @@ export default function Card(props){
           <p className="element__caption-like-count">{props.card.likes.length}</p>
         </div>
       </figcaption>
-      <button type="button" className="element__delete-button"></button>        
+      <button type="button" className="element__delete-button" onClick={props.onDeleteClick}></button>        
     </figure>
   )
 }
