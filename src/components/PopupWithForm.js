@@ -8,8 +8,6 @@ export default function PopupWithForm(props){
         <fieldset className="popup__fieldset">
           <h2 className="popup__title">{props.title}</h2>
           {props.children}
-          {/* <input type="url" name="profileAvatarLink" placeholder="Ссылка на аватар" className="popup__input popup__input_value_src" required />
-          <p className="popup__error profileAvatarLink-error"></p> */}
           <button type="submit" className="popup__save-button">{props.submitBtnName}</button>
         </fieldset>
       </form>
