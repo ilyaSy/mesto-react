@@ -3,7 +3,7 @@ import React from 'react';
 export default function PopupWithForm(props){
   return (
     <div className={`popup popup_type_${props.name} ${props.isOpen && 'popup_opened'}`}>
-      <form action="/" name={props.name} className="popup__container" noValidate>
+      <form action="/" name={props.name} className="popup__container" noValidate onSubmit={props.onSubmit}>
         <button type="button" className="popup__close-button" onClick={props.onClose}></button>
         <fieldset className="popup__fieldset">
           <h2 className="popup__title">{props.title}</h2>
