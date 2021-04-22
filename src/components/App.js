@@ -1,9 +1,9 @@
 import React from 'react';
 
+import Loading from './Loading';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-// import PopupWithForm from './PopupWithForm';
 import EditAvatarPopup from './EditAvatarPopup';
 import EditProfilePopup from './EditProfilePopup';
 import AddPlacePopup from './AddPlacePopup';
@@ -17,11 +17,11 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  //const [isConfirmPopupOpen, setIsConfirmPopupOpen] = React.useState(false);
-  const [deleteCard, setDeleteCard] = React.useState(null);
+  const [сardToDelete, setCardToDelete] = React.useState(null);
   const [selectedCard, setSelectedCard] = React.useState(null);
   const [currentUser, setCurrentUser] = React.useState(null);
   const [cards, setCards] = React.useState([])
+  const [textLoading, setTextLoading] = React.useState("Данные загружаются...");
 
   React.useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -29,7 +29,10 @@ function App() {
         setCurrentUser(userData);
         setCards(initialCards)
       })
-      .catch(err => console.log('Ошибка: ' + err))
+      .catch(err => {
+        console.log('Ошибка: ' + err);
+        setTextLoading('Ошибка при загрузке данных!');
+      })
   }, []);
 
   //close on Escape button
@@ -41,24 +44,23 @@ function App() {
 
   const handleEditAvatarClick = () => {
     document.addEventListener('keydown', closeByEscapeBtn);
-    setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
+    setIsEditAvatarPopupOpen(true);
   }
 
   const handleEditProfileClick = () => {
     document.addEventListener('keydown', closeByEscapeBtn);
-    setIsEditProfilePopupOpen(!isEditProfilePopupOpen);
+    setIsEditProfilePopupOpen(true);
   }
 
 
   const handleAddPlaceClick = () => {
     document.addEventListener('keydown', closeByEscapeBtn);
-    setIsAddPlacePopupOpen(!isAddPlacePopupOpen);
+    setIsAddPlacePopupOpen(true);
   }
 
   const handleDeleteClick = (card) => {
     document.addEventListener('keydown', closeByEscapeBtn);
-    // setIsConfirmPopupOpen(!isConfirmPopupOpen);
-    setDeleteCard(card);
+    setCardToDelete(card);
   }
 
   const handleCardClick = (card) => {
@@ -69,9 +71,8 @@ function App() {
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
-    setIsAddPlacePopupOpen(false);    
-    // setIsConfirmPopupOpen(false);
-    setDeleteCard(null);
+    setIsAddPlacePopupOpen(false);
+    setCardToDelete(null);
     setSelectedCard(null);
     document.removeEventListener('keydown', closeByEscapeBtn);
   }
@@ -93,13 +94,13 @@ function App() {
   const handleCardLike = card => {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     
-    api.likeCard(card._id, isLiked)
+    api.toggleLikeCard(card._id, isLiked)
       .then(newCard => { setCards(cards => cards.map(c => c._id === card._id ? newCard : c)) })
       .catch(err => console.log('Ошибка: ' + err))
   }
 
   const handleCardDelete = () => {
-    const card = deleteCard;
+    const card = сardToDelete;
     api.deleteCard(card._id)
       .then(() => { setCards(cards => cards.filter(c => c._id !== card._id)) })
       .then(() => {closeAllPopups()})
@@ -131,17 +132,14 @@ function App() {
         <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
         <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
         <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
-        <ConfirmDeletePopup isOpen={deleteCard ? true : false} onClose={closeAllPopups} onDeletePlace={handleCardDelete}/>
+        <ConfirmDeletePopup isOpen={сardToDelete ? true : false} onClose={closeAllPopups} onDeletePlace={handleCardDelete}/>
 
         {/* <PopupWithForm title='Вы уверены?' name='confirm' submitBtnName='Да' isOpen={isConfirmPopupOpen} onClose={closeAllPopups} /> */}       
 
         <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
       </CurrentUserContext.Provider>
     :
-    <>
-      <Header />
-      <h1 className="content__title">Данные загружаются ... </h1>
-    </>
+    <Loading text={textLoading}/>
   );
 }
 

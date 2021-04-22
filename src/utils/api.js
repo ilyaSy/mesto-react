@@ -1,10 +1,8 @@
-const tokenAuth = '30b18b22-df4e-456d-bb26-16cda3a69c12';
-const tokenGroup = 'cohort-21';
-const apiURL = 'https://mesto.nomoreparties.co/v1';
+import {tokenAuth, groupId, apiURL} from '../utils/constants';
 
 export class Api{
-  constructor({tokenAuth, tokenGroup, apiURL}){
-    this._apiURL = `${apiURL}/${tokenGroup}`;
+  constructor({tokenAuth, groupId, apiURL}){
+    this._apiURL = `${apiURL}/${groupId}`;
     this._headers = { 
       authorization: tokenAuth,
       'Content-Type': 'application/json'
@@ -21,7 +19,7 @@ export class Api{
       .then(this._handleApiResult.bind(null, 'addCard'))
   }
   
-  likeCard(cardId, isLiked){
+  toggleLikeCard(cardId, isLiked){
     return fetch(`${this._apiURL}/cards/likes/${cardId}`, {method: isLiked ? 'DELETE' : 'PUT', headers: this._headers})
       .then(this._handleApiResult.bind(null, 'likeCard'))
   }
@@ -53,7 +51,7 @@ export class Api{
 
 const api = new Api({
   tokenAuth: tokenAuth,
-  tokenGroup: tokenGroup,
+  groupId: groupId,
   apiURL: apiURL
 });
 

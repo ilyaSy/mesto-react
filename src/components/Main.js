@@ -10,7 +10,7 @@ export default function Main(props){
     <main className="content">
       <section className="profile" aria-label="content">
         <div className="profile__avatar-container">
-          <img src={currentUser.avatar} alt="Фото: аватар пользователя" className="profile__avatar" />
+          <img src={currentUser.avatar} alt={`Аватар: ${currentUser.name}`} className="profile__avatar" />
           <button className="profile__edit-ava-button" onClick={props.onEditAvatar}></button>
         </div>
         <div className="profile__info">
@@ -24,11 +24,10 @@ export default function Main(props){
       </section>
 
       <section className="elements" aria-label="elements">
-        {props.cards.map((card, i) =>
-          <Card card={card} key={`card-${card._id}`} 
+        {props.cards.map(card =>
+          <Card card={card} key={card._id} 
             onCardClick={props.onCardClick} 
-            onDeleteClick={props.onDeleteClick} 
-            // onDeleteClick={props.onCardDelete}
+            onDeleteClick={props.onDeleteClick}
             onCardLike={props.onCardLike}/>
         )}
       </section>

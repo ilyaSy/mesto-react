@@ -1,7 +1,8 @@
 export default function Footer(){
+  const year = new Date().getFullYear();
   return (
     <footer className="footer">
-      &copy; 2020 Mesto Russia
+      &copy; {year} Mesto Russia
     </footer>
   )
 }

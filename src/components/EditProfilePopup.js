@@ -13,12 +13,7 @@ export default function EditProfilePopup(props) {
     setDescription(currentUser.about);
   }, [currentUser]); 
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    
-    props.onUpdateUser({ name, about: description });
-  }
-
+  const handleSubmit = event => { props.onUpdateUser({ name, about: description }) }
   const handleChangeName = event => { setName(event.target.value) }
   const handleChangeDescription = event => { setDescription(event.target.value) }
 

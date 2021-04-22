@@ -10,11 +10,7 @@ export default function AddPlacePopup(props) {
     setLink('');
   }, [props.isOpen]); 
 
-  const handleSubmit = event => {
-    event.preventDefault();    
-    props.onAddPlace({ name, link });
-  }
-
+  const handleSubmit = event => { props.onAddPlace({ name, link }) }
   const handleChangeName = event => { setName(event.target.value) }
   const handleChangeLink = event => { setLink(event.target.value) }
 

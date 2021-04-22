@@ -8,11 +8,7 @@ export default function EditAvatarPopup(props) {
     inputRef.current.value = '';
   }, [inputRef]);
 
-  const handleSubmit = event => {
-    event.preventDefault();
-  
-    props.onUpdateAvatar( {avatar: inputRef.current.value} );
-  } 
+  const handleSubmit = event => { props.onUpdateAvatar( {avatar: inputRef.current.value} ) } 
 
   return (
     <PopupWithForm title='Обновить аватар' name='ava' submitBtnName='Сохранить' isOpen={props.isOpen} onClose={props.onClose} onSubmit={handleSubmit}>

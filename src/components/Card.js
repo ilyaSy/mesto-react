@@ -10,18 +10,21 @@ export default function Card(props){
   const cardLikeButtonClassName = `element__caption-like ${isLiked ? 'element__caption-like_active' : ''}`;
 
   const handleClick = () => { props.onCardClick(props.card) }
+  const handleLike = () => { props.onCardLike(props.card) }
+  const handleDelete = () => { props.onDeleteClick(props.card) }
+
 
   return (
     <figure className="element">
-      <img src={props.card.link} alt="Изображение не может быть показано" className="element__picture" onClick={handleClick}/>
+      <img src={props.card.link} alt={props.card.name} className="element__picture" onClick={handleClick}/>
       <figcaption className="element__caption">
         <h2 className="element__caption-text">{props.card.name}</h2>
         <div className='element__caption-like-group'>
-          <button type="button" className={cardLikeButtonClassName} onClick={() => {props.onCardLike(props.card)}} ></button>
+          <button type="button" className={cardLikeButtonClassName} onClick={handleLike} ></button>
           <p className="element__caption-like-count">{props.card.likes.length}</p>
         </div>
       </figcaption>
-      <button type="button" className={cardDeleteButtonClassName} onClick={() => {props.onDeleteClick(props.card)}}></button>
+      <button type="button" className={cardDeleteButtonClassName} onClick={handleDelete}></button>
     </figure>
   )
 }
