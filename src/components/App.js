@@ -1,5 +1,5 @@
 import React from 'react';
-
+import {Switch, Route, useHistory } from 'react-router-dom';
 import Loading from './Loading';
 import Header from './Header';
 import Main from './Main';
@@ -9,7 +9,11 @@ import EditProfilePopup from './EditProfilePopup';
 import AddPlacePopup from './AddPlacePopup';
 import ConfirmDeletePopup from './ConfirmDeletePopup';
 import ImagePopup from './ImagePopup';
+import Register from './Register';
+import Login from './Login';
+import ProtectedRoute from './ProtectedRoute';
 import api from '../utils/api';
+import auth from '../utils/auth';
 
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
@@ -22,18 +26,42 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState(null);
   const [cards, setCards] = React.useState([])
   const [textLoading, setTextLoading] = React.useState("Данные загружаются...");
+  const [email, setEmail] = React.useState('');
 
-  React.useEffect(() => {
+  const history = useHistory();
+
+  // React.useEffect(() => {
+  //   Promise.all([api.getUserInfo(), api.getInitialCards()])
+  //     .then(([userData, initialCards]) => {
+  //       setCurrentUser(userData);
+  //       setCards(initialCards)
+  //     })
+  //     .catch(err => {
+  //       console.log('Ошибка: ' + err);
+  //       setTextLoading('Ошибка при загрузке данных!');
+  //     })
+  // }, []);
+
+  const loadData = () => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userData, initialCards]) => {
         setCurrentUser(userData);
         setCards(initialCards)
+        history.push('/');
       })
       .catch(err => {
-        console.log('Ошибка: ' + err);
+        console.error('Ошибка: ' + err);
         setTextLoading('Ошибка при загрузке данных!');
       })
-  }, []);
+  }
+
+  React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt){
+      history.push("/");
+      loadData();
+    }
+  }, [history]);
 
   //close on Escape button
   const closeByEscapeBtn = event => {
@@ -51,7 +79,6 @@ function App() {
     document.addEventListener('keydown', closeByEscapeBtn);
     setIsEditProfilePopupOpen(true);
   }
-
 
   const handleAddPlaceClick = () => {
     document.addEventListener('keydown', closeByEscapeBtn);
@@ -114,32 +141,77 @@ function App() {
       .catch(err => console.log('Ошибка: ' + err))
   }
 
+  const handleRegister = (userCredantials) => {
+    auth.registerUser(userCredantials)
+      .then(res => {
+        if(res.data.email) {
+          history.push('/sign-in');
+        }
+      })
+      .catch(err => console.log('Ошибка: ' + err))
+  }
+
+  const handleLogin = (userCredantials) => {
+    auth.loginUser(userCredantials)
+      .then(res => {
+        const jwt = res.token;
+        if (jwt){
+          setEmail(userCredantials.email);
+          localStorage.setItem('jwt', jwt);
+          loadData();
+        }
+      })
+  }
+
+  const handleSignOut = () => {
+    setEmail('');
+    localStorage.removeItem('jwt');
+    history.push('/sign-in');
+  }
+
   return (
-    currentUser && cards ?
-      <CurrentUserContext.Provider value={currentUser}>
-        <Header />
-        <Main 
-          cards={cards}
-          onEditProfile={handleEditProfileClick} 
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onCardClick={handleCardClick}
-          onDeleteClick={handleDeleteClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}/>
-        <Footer />
+    <CurrentUserContext.Provider value={currentUser}>
+      <Header email={email} onSignOut={handleSignOut}/>
 
-        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
-        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
-        <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
-        <ConfirmDeletePopup isOpen={сardToDelete ? true : false} onClose={closeAllPopups} onDeletePlace={handleCardDelete}/>
+      <Switch>
+        {/* {currentUser && cards ? */}
+          <ProtectedRoute exact path="/"
+            component={Main}
+            cards={cards}
+            onEditProfile={handleEditProfileClick} 
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onDeleteClick={handleDeleteClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}/>
+          {/* : <Loading text={textLoading}/> */}
+        {/* } */}
 
-        {/* <PopupWithForm title='Вы уверены?' name='confirm' submitBtnName='Да' isOpen={isConfirmPopupOpen} onClose={closeAllPopups} /> */}       
+        <Route path="/sign-up">
+          <Register onRegister={handleRegister}/>
+        </Route>
 
-        <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
-      </CurrentUserContext.Provider>
-    :
-    <Loading text={textLoading}/>
+        <Route path="/sign-in">
+          <Login onLogin={handleLogin}/>
+        </Route>
+
+        <ProtectedRoute path="*" />
+      </Switch>
+
+      <Footer />
+
+      {currentUser && cards &&
+        <>
+          <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
+          <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
+          <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
+          <ConfirmDeletePopup isOpen={сardToDelete ? true : false} onClose={closeAllPopups} onDeletePlace={handleCardDelete}/>
+        </>
+      }
+
+      <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
+    </CurrentUserContext.Provider>
   );
 }
 

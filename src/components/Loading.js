@@ -2,7 +2,7 @@ import React from 'react';
 import Header from './Header';
 
 export default function Loading(props){
-  const text = props.text || 'Данные загружены';
+  const text = props.text || 'Загрузка данных';
   return (
     <>
       <Header />
